@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU-Lasttest - Endlos Schleife</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #status {
+            font-size: 18px;
+            color: green;
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #stopButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Endlos CPU-Lasttest</h1>
+    <p>Drücke den Button, um die CPU deines Geräts mit einer **Endlos-Schleife** von Berechnungen zu testen.</p>
+    <!-- Eingabefelder für Anzahl der Anfragen und Zeit zwischen den Durchläufen -->
+    <div>
+        <label for="numRequests">Anzahl der Berechnungen pro Durchgang:</label>
+        <input type="number" id="numRequests" value="100" min="1" />
+    </div>
+    <div>
+        <label for="delay">Zeit zwischen den Durchläufen (in ms):</label>
+        <input type="number" id="delay" value="500" min="1" />
+    </div>
+    <button id="startButton">Start Endlos Test</button>
+    <button id="stopButton" disabled>Stop Test</button>
+    <p id="status"></p>
+    <script>
+        let testInterval; // Variable für das Intervall
+        let isTesting = false; // Flag, um zu wissen, ob der Test läuft
+
+        // Funktion für CPU-belastende Aufgabe
+        function cpuIntensiveTask() {
+            let sum = 0;
+            for (let i = 0; i < 100000; i++) {
+                sum += Math.sqrt(Math.random() * 1000);
+            }
+            // Optional: Ergebnis verwenden, um Optimierung zu verhindern
+            if (sum < 0) console.log(sum);
+        }
+
+        // Funktion zum Starten des Tests
+        function startTest() {
+            const numRequests = parseInt(document.getElementById("numRequests").value, 10);
+            const delay = parseInt(document.getElementById("delay").value, 10);
+
+            // Status anzeigen
+            document.getElementById("status").innerHTML = "Test läuft...";
+
+            // Deaktiviere Start-Button und aktiviere Stop-Button
+            document.getElementById("startButton").disabled = true;
+            document.getElementById("stopButton").disabled = false;
+
+            // Endlosschleife mit Interval
+            testInterval = setInterval(() => {
+                for (let i = 0; i < numRequests; i++) {
+                    cpuIntensiveTask(); // Führe CPU-belastende Aufgabe aus
+                }
+            }, delay); // Alle X Millisekunden werden X Berechnungen ausgeführt
+
+            isTesting = true;
+        }
+
+        // Funktion zum Stoppen des Tests
+        function stopTest() {
+            clearInterval(testInterval); // Stoppe das Intervall
+            document.getElementById("status").innerHTML = "Test gestoppt.";
+            document.getElementById("startButton").disabled = false; // Reaktive den Start-Button
+            document.getElementById("stopButton").disabled = true; // Deaktive den Stop-Button
+            isTesting = false;
+        }
+
+        // Event-Listener für den Start-Button
+        document.getElementById("startButton").addEventListener("click", function() {
+            if (!isTesting) {
+                startTest();
+            }
+        });
+
+        // Event-Listener für den Stop-Button
+        document.getElementById("stopButton").addEventListener("click", function() {
+            if (isTesting) {
+                stopTest();
+            }
+        });
+    </script>
+</body>
+</html>
